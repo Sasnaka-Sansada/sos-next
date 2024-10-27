@@ -1,7 +1,7 @@
 export default function Home() {
   return (
-    <main>
-      <h1>Hi</h1>
+    <main className="h-screen w-screen flex items-center justify-center">
+      <h1 className="font-extrabold text-2xl">Sasnaka Operation System</h1>
     </main>
   );
 }
