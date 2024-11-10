@@ -1,17 +1,18 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Globe } from "lucide-react";
+import getSeminars from "@/app/api/seminars";
 
 interface Seminar {
   id: number;
   school: string;
   location: string;
-  subGroup?: string;
+  sub_group?: string;
   date: string;
-  contactDetails: string;
-  remainingSlots: number;
+  contact_detail: string;
+  slots_count: number;
   hasApplied: boolean;
 }
 
@@ -52,7 +53,7 @@ const SeminarCard: React.FC<SeminarCardProps> = ({
 
           <div>
             <label className="font-medium">Sub Group (Optional):</label>
-            <div className="text-gray-700">{seminar.subGroup}</div>
+            <div className="text-gray-700">{seminar.sub_group}</div>
           </div>
 
           <div>
@@ -62,12 +63,12 @@ const SeminarCard: React.FC<SeminarCardProps> = ({
 
           <div>
             <label className="font-medium">Contact Details:</label>
-            <div className="text-gray-700">{seminar.contactDetails}</div>
+            <div className="text-gray-700">{seminar.contact_detail}</div>
           </div>
 
           <div>
             <label className="font-medium">Remaining Slots:</label>
-            <div className="text-gray-700">{seminar.remainingSlots}</div>
+            <div className="text-gray-700">{seminar.slots_count}</div>
           </div>
         </div>
 
@@ -93,39 +94,19 @@ const SeminarCard: React.FC<SeminarCardProps> = ({
   );
 };
 
-const SeminarDashboard = () => {
-  const [seminars, setSeminars] = useState([
-    {
-      id: 1,
-      school: "St. Mary's College",
-      location: "https://Maps.App.Goo.Gl/WsRAavSpYLSCjb8Z72",
-      subGroup: "Moratuwa",
-      date: "01/10/2024",
-      contactDetails: "0771231312",
-      remainingSlots: 10,
-      hasApplied: false,
-    },
-    {
-      id: 2,
-      school: "Royal College",
-      location: "https://maps.google.com/royal",
-      subGroup: "Colombo",
-      date: "05/10/2024",
-      contactDetails: "0771231313",
-      remainingSlots: 15,
-      hasApplied: false,
-    },
-    {
-      id: 3,
-      school: "Ananda College",
-      location: "https://maps.google.com/ananda",
-      subGroup: "Maradana",
-      date: "10/10/2024",
-      contactDetails: "0771231314",
-      remainingSlots: 8,
-      hasApplied: false,
-    },
-  ]);
+const SeminarDashboard: React.FC = () => {
+  const [seminars, setSeminars] = useState<Seminar[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const loadData = async () => {
+      const seminars = await getSeminars()
+      setSeminars(seminars)
+      setIsLoading(false)
+    }
+    loadData()
+  },[])
+
 
   const handleApply = (seminarId: number) => {
     setSeminars(
@@ -134,7 +115,7 @@ const SeminarDashboard = () => {
           ? {
               ...seminar,
               hasApplied: true,
-              remainingSlots: seminar.remainingSlots - 1,
+              remainingSlots: seminar.slots_count - 1,
             }
           : seminar
       )
@@ -148,7 +129,7 @@ const SeminarDashboard = () => {
           ? {
               ...seminar,
               hasApplied: false,
-              remainingSlots: seminar.remainingSlots + 1,
+              remainingSlots: seminar.slots_count + 1,
             }
           : seminar
       )

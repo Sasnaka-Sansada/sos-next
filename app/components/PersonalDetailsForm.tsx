@@ -14,18 +14,39 @@ import Link from 'next/link';
 
 const PersonalDetailsForm = () => {
   const districts = [
-    "District 1",
-    "District 2",
-    "District 3",
-    "District 4",
-    "District 5"
+    "Kandy",
+    "Colombo",
+    "Galle",
+    "Matara",
+    "Kurunegala",
+    "Jaffna",
+    "Anuradhapura",
+    "Polonnaruwa",
+    "Gampaha",
+    "Kalutara",
+    "Ratnapura",
+    "Badulla",
+    "Monaragala",
+    "Ampara",
+    "Trincomalee",
+    "Batticaloa",
+    "Mannar",
+    "Mullaitivu",
+    "Vavuniya",
+    "Kilinochchi",
+    "Hambantota",
+    "Nuwara Eliya",
+    "Puttalam",
+    "Matale",
+    "Kegalle",
+    
   ];
 
   const genders = ["Male", "Female", "Other", "Prefer not to say"];
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    // Handle form submission
+    
   };
 
   return (
