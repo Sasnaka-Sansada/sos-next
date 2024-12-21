@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Calendar } from 'lucide-react';
+import { addSeminarData } from '@/utils/supabaseRequests';
+import { useAuth } from '@clerk/nextjs';
 
 interface CreateSeminarFormProps {
   onSeminarCreate: (newSeminar: any) => void;
@@ -21,6 +23,8 @@ const CreateSeminarForm: React.FC<CreateSeminarFormProps> = ({ onSeminarCreate }
     remainingSlots: '',
   });
 
+  const {getToken} = useAuth();
+
   const [showSuccess, setShowSuccess] = useState(false);
 
   const handleChange = (e: any) => {
@@ -31,35 +35,9 @@ const CreateSeminarForm: React.FC<CreateSeminarFormProps> = ({ onSeminarCreate }
     }));
   };
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async(e: any) => {
     e.preventDefault();
-    
-    // Create new seminar object
-    const newSeminar = {
-      id: Date.now(), // Simple way to generate unique ID
-      ...formData,
-      remainingSlots: parseInt(formData.remainingSlots),
-      hasApplied: false
-    };
-
-    // Call parent handler
-    onSeminarCreate(newSeminar);
-
-    // Show success message
-    setShowSuccess(true);
-
-    // Reset form
-    setFormData({
-      school: '',
-      location: '',
-      subGroup: '',
-      date: '',
-      contactDetails: '',
-      remainingSlots: '',
-    });
-
-    // Hide success message after 3 seconds
-    setTimeout(() => setShowSuccess(false), 3000);
+    addSeminarData(formData)
   };
 
   return (

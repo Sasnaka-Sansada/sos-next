@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +29,8 @@ import {
   FileText,
   Star
 } from 'lucide-react';
+
+import { getSeminarData } from '@/utils/supabaseRequests';
 
 interface Seminar {
   id: number;
@@ -193,31 +195,15 @@ const PastSeminarCard: React.FC<PastSeminarCardProps> = ({ seminar, onUpdateStat
 };
 
 const AdminPastSeminars = () => {
-  const [seminars, setSeminars] = useState([
-    {
-      id: 1,
-      school: "St. Mary's College",
-      subGroup: "Moratuwa",
-      date: "2024-01-10",
-      status: 'pending',
-      attendees: null,
-      review: null
-    },
-    {
-      id: 2,
-      school: "Royal College",
-      subGroup: "Colombo",
-      date: "2024-01-15",
-      status: 'completed',
-      attendees: 45,
-      review: {
-        rating: "4",
-        comment: "Great engagement from students. Well organized session.",
-        attendees: "45"
-      }
-    },
-    // Add more sample data as needed
-  ]);
+  const [seminars, setSeminars] = useState<Seminar[]>([]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      const seminars = await getSeminarData();
+      setSeminars(seminars);
+    };
+    loadData();
+  }, []);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');

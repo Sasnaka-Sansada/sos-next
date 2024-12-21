@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Select,
@@ -26,11 +26,14 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { getAttendedSeminarData } from '@/utils/supabaseRequests';
+import Link from 'next/link';
 
 interface Seminar {
   id: number;
   school: string;
-  subGroup: string;
+  location: string;
   date: string;
   duration: string;
   status: string;
@@ -61,7 +64,7 @@ const SeminarCard = ({ seminar }: { seminar: Seminar }) => {
             </h3>
             <p className="text-gray-500 flex items-center gap-2 mt-1">
               <MapPin className="w-4 h-4" />
-              {seminar.subGroup}
+              {seminar.location}
             </p>
           </div>
           <Badge 
@@ -82,15 +85,15 @@ const SeminarCard = ({ seminar }: { seminar: Seminar }) => {
           </div>
           <div className="flex items-center gap-2 text-gray-600">
             <Clock className="w-4 h-4" />
-            <span>{seminar.duration}</span>
+            <span>2</span>
           </div>
           <div className="flex items-center gap-2 text-gray-600">
             <Users className="w-4 h-4" />
-            <span>{seminar.attendees} Students</span>
+            <span>200 Students</span>
           </div>
           <div className="flex items-center gap-2 text-gray-600">
             <Star className="w-4 h-4" />
-            <span>Role: {seminar.role}</span>
+            <span>Role: Presenter</span>
           </div>
         </div>
 
@@ -137,69 +140,37 @@ const VolunteerDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [timeFilter, setTimeFilter] = useState('all');
 
-  const [seminars] = useState([
-    {
-      id: 1,
-      school: "St. Mary's College",
-      subGroup: "Moratuwa",
-      date: "January 10, 2024",
-      duration: "2 hours",
-      status: "completed",
-      attendees: 45,
-      role: "Lead Presenter",
-      achievements: ["Best Presentation", "High Engagement"],
-      review: {
-        rating: 5,
-        comment: "Excellent presentation skills and student engagement. The workshop was well-structured and interactive."
-      }
-    },
-    {
-      id: 2,
-      school: "Royal College",
-      subGroup: "Colombo",
-      date: "January 15, 2024",
-      duration: "1.5 hours",
-      status: "completed",
-      attendees: 38,
-      role: "Co-facilitator",
-      achievements: ["Team Collaboration"],
-      review: {
-        rating: 4,
-        comment: "Good support and coordination with the team. Helped manage student activities effectively."
-      }
-    },
-    {
-      id: 3,
-      school: "Ananda College",
-      subGroup: "Maradana",
-      date: "January 20, 2024",
-      duration: "2.5 hours",
-      status: "pending review",
-      attendees: 52,
-      role: "Technical Support",
-      achievements: ["Technical Excellence"],
-      review: null
-    }
-  ]);
+  const [seminars, setSeminars] = useState([] as Seminar[]);
 
-  const stats = {
-    totalHours: seminars.reduce((acc, sem) => 
-      acc + parseFloat(sem.duration.split(' ')[0]), 0),
-    totalStudents: seminars.reduce((acc, sem) => acc + sem.attendees, 0),
-    averageRating: (seminars
-      .filter(sem => sem.review)
-      .reduce((acc, sem) => acc + (sem.review ? sem.review.rating : 0), 0) / 
-      seminars.filter(sem => sem.review).length
-    ).toFixed(1)
-  };
+  useEffect(() => {
+    const loadData = async () => {
+      const seminars = await getAttendedSeminarData();
+      setSeminars(seminars);
+    };
+    loadData();
+  }, []);
+
+  
+
+  // const stats = {
+  //   totalHours: seminars.reduce((acc, sem) => 
+  //     acc + parseFloat(sem.duration.split(' ')[0]), 0),
+  //   totalStudents: seminars.reduce((acc, sem) => acc + sem.attendees, 0),
+  //   averageRating: (seminars
+  //     .filter(sem => sem.review)
+  //     .reduce((acc, sem) => acc + (sem.review ? sem.review.rating : 0), 0) / 
+  //     seminars.filter(sem => sem.review).length
+  //   ).toFixed(1)
+  // };
 
   const filteredSeminars = seminars.filter(seminar => 
     seminar.school.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    seminar.subGroup.toLowerCase().includes(searchTerm.toLowerCase())
+    seminar.location.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
+      <Link href="/dashboard"><Button variant="ghost" className="mb-4">{"<"} Back</Button></Link>
       <div className="max-w-7xl mx-auto">
         <header className="mb-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-6">My Seminar History</h1>
@@ -211,7 +182,7 @@ const VolunteerDashboard = () => {
                   <div>
                     <p className="text-sm text-blue-600">Total Hours</p>
                     <p className="text-2xl font-bold text-blue-700">
-                      {stats.totalHours}
+                      {/* {stats.totalHours} */}5
                     </p>
                   </div>
                   <Clock className="w-8 h-8 text-blue-500" />
@@ -225,7 +196,7 @@ const VolunteerDashboard = () => {
                   <div>
                     <p className="text-sm text-green-600">Students Reached</p>
                     <p className="text-2xl font-bold text-green-700">
-                      {stats.totalStudents}
+                      {/* {stats.totalStudents} */}200
                     </p>
                   </div>
                   <Users className="w-8 h-8 text-green-500" />
@@ -239,7 +210,7 @@ const VolunteerDashboard = () => {
                   <div>
                     <p className="text-sm text-yellow-600">Average Rating</p>
                     <p className="text-2xl font-bold text-yellow-700">
-                      {stats.averageRating}/5
+                      {/* {stats.averageRating}/5 */}4/5
                     </p>
                   </div>
                   <Star className="w-8 h-8 text-yellow-500" />
@@ -284,7 +255,9 @@ const VolunteerDashboard = () => {
 
           <TabsContent value="all" className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {filteredSeminars.map(seminar => (
+              {filteredSeminars
+              .filter(seminar => seminar.status === 'completed' || seminar.status === 'pending')
+              .map(seminar => (
                 <SeminarCard key={seminar.id} seminar={seminar} />
               ))}
             </div>
@@ -304,7 +277,7 @@ const VolunteerDashboard = () => {
           <TabsContent value="pending" className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {filteredSeminars
-                .filter(seminar => seminar.status === 'pending review')
+                .filter(seminar => seminar.status === 'pending')
                 .map(seminar => (
                   <SeminarCard key={seminar.id} seminar={seminar} />
                 ))

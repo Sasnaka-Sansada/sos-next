@@ -11,6 +11,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from 'next/link';
+import { useState } from 'react';
+import { supabase } from '@/utils/supabaseClient';
+import { useRouter } from 'next/navigation';
 
 const PersonalDetailsForm = () => {
   const districts = [
@@ -44,9 +47,35 @@ const PersonalDetailsForm = () => {
 
   const genders = ["Male", "Female", "Other", "Prefer not to say"];
 
-  const handleSubmit = (e: any) => {
+  const router = useRouter();
+
+  const [formData, setFormData] = useState({
+    district: '',
+    fullName: '',
+    phoneNumber: '',
+    birthday: '',
+    nicNumber: '',
+    address: '',
+    gender: '',
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    const { error } = await (await supabase).from('volunteer_personal_details').insert([formData]);
+    if (error) {
+      console.error('Error inserting data:', error.message);
+    } else {
+      router.push('/educational');
+    }
   };
 
   return (
@@ -58,7 +87,7 @@ const PersonalDetailsForm = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <label className="text-sm font-medium">Current District</label>
-            <Select>
+            <Select  onValueChange={(value) => handleSelectChange('district', value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Select Your District" />
               </SelectTrigger>
@@ -119,7 +148,7 @@ const PersonalDetailsForm = () => {
 
           <div className="space-y-2">
             <label className="text-sm font-medium">Gender</label>
-            <Select>
+            <Select onValueChange={(value) => handleSelectChange('gender', value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Select Gender" />
               </SelectTrigger>

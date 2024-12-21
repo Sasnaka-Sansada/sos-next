@@ -4,7 +4,7 @@ import NavBar from './components/NavBar'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider dynamic>
       <html lang="en">
         <body>
           <NavBar />

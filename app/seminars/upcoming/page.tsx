@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Globe } from "lucide-react";
-import getSeminars from "@/app/api/seminars";
+import { getUpcomingSeminarData } from "@/utils/supabaseRequests";
+import Link from "next/link";
 
 interface Seminar {
   id: number;
@@ -95,18 +96,17 @@ const SeminarCard: React.FC<SeminarCardProps> = ({
 };
 
 const SeminarDashboard: React.FC = () => {
-  const [seminars, setSeminars] = useState<Seminar[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [seminars, setSeminars] = useState<Seminar[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
-      const seminars = await getSeminars()
-      setSeminars(seminars)
-      setIsLoading(false)
-    }
-    loadData()
-  },[])
-
+      const seminars = await getUpcomingSeminarData();
+      setSeminars(seminars);
+      setIsLoading(false);
+    };
+    loadData();
+  }, []);
 
   const handleApply = (seminarId: number) => {
     setSeminars(
@@ -138,17 +138,24 @@ const SeminarDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
+      <Link href="/dashboard"><Button variant="ghost" className="mb-4">{"<"} Back</Button></Link>
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {seminars.map((seminar) => (
-            <SeminarCard
-              key={seminar.id}
-              seminar={seminar}
-              onApply={handleApply}
-              onRevert={handleRevert}
-            />
-          ))}
-        </div>
+        {seminars.length === 0 ? (
+          <div className="text-center text-gray-500">
+            There's no upcoming seminars.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {seminars.map((seminar) => (
+              <SeminarCard
+                key={seminar.id}
+                seminar={seminar}
+                onApply={handleApply}
+                onRevert={handleRevert}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
